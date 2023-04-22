@@ -4,6 +4,7 @@ import { serveStatic } from 'hono/serve-static.bun';
 import Usuario from "./controller/usuario";
 import Cuenta from "./controller/cuenta";
 import Equipo from "./controller/equipo";
+import Rol from "./controller/rol";
 
 const port = parseInt(`${process.env.PORT}`) || 3000;
 
@@ -19,6 +20,7 @@ app.get("/", (c) => {
 app.route("/usuario",Usuario);
 app.route("/cuenta",Cuenta);
 app.route("/equipo",Equipo);
+app.route("/rol",Rol);
 
 console.log(`Running at http://localhost:${port}`);
 
