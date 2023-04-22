@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import Usuario from "../models/usuario";
+import { AccessKey, Usuario } from "../models";
 
 const usuario = new Hono();
 
@@ -23,13 +23,12 @@ usuario.get("/:id", async c => {
 
 usuario.post("/", async c => {
     try {
-        const body: typeof Usuario = await c.req.json();
-        console.log("nuevo:", body);
-        const nuevo = Usuario.create(
-            { ...body }
-        );
+        const data: Object = await c.req.json();
 
-        return c.json(nuevo, 200);
+        const nuevo = await Usuario.create({ ...data });
+        await AccessKey.create({ ...data, usuario_id: nuevo["id"] })
+
+        return c.json(nuevo);
     } catch (error) {
         return c.error = error;
     }
@@ -39,13 +38,17 @@ usuario.delete("/:id", async c => {
     try {
         const { id } = c.req.param();
         await Usuario.update({
-            activo: false
+            activo: 0
         }, {
             where: {
                 id
             }
         });
-        return c.json(Usuario.findByPk(id));
+        return c.json(Usuario.findOne({
+            where: {
+                id
+            }
+        }));
     } catch (error) {
         return c.json({ mensaje: error }, 500);
     }
@@ -54,15 +57,15 @@ usuario.delete("/:id", async c => {
 usuario.patch("/:id", async c => {
     try {
         const { id } = c.req.param();
-        const data: typeof Usuario = await c.req.json();
+        const data = await c.req.json();
 
-        const usuario = await Usuario.update(data, {
+        await Usuario.update(data, {
             where: {
                 id: id
             }
         });
 
-        return c.json(await Usuario.findByPk(id));
+        return c.json(await Usuario.findOne({ where: { id } }));
     } catch (error) {
         return c.error = error;
     }
