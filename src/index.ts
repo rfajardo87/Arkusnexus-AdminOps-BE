@@ -1,30 +1,43 @@
 import { Hono } from "hono";
+import { jwt } from "hono/jwt";
 import { logger } from "hono/logger";
-import { serveStatic } from 'hono/serve-static.bun';
-import Usuario from "./controller/usuario";
-import Cuenta from "./controller/cuenta";
-import Equipo from "./controller/equipo";
-import Rol from "./controller/rol";
+import { cors } from "hono/cors";
+import { serveStatic } from "hono/serve-static.bun";
+
+/**Controllers */
+import v1 from "./controller/v1";
+
+/**documentation */
+import swaggerUi from "./docs/docs";
 
 const port = parseInt(`${process.env.PORT}`) || 3000;
 
 const app = new Hono();
 
-app.use('/favicon.ico', serveStatic({ path: './public/favicon.ico' }));
+app.use("/favicon.ico", serveStatic({ path: "./public/favicon.ico" }));
+// app.use("/docs",swaggerUi.serve);
 
-app.use("*",logger());
-app.get("/", (c) => {
-  return c.json({ message: "Hello World!" });
-});
+app.use("*", logger());
+app.use(
+  "*",
+  cors({
+    origin: "http://localhost:3000",
+    allowMethods: ["POST", "GET", "OPTIONS", "DELETE", "PATCH"],
+  })
+);
 
-app.route("/usuario",Usuario);
-app.route("/cuenta",Cuenta);
-app.route("/equipo",Equipo);
-app.route("/rol",Rol);
+app.use(
+  "/api/*",
+  jwt({
+    secret: process.env.SECRET_TOKEN,
+  })
+);
+
+app.route("/v1", v1);
 
 console.log(`Running at http://localhost:${port}`);
 
 export default {
   port,
-  fetch: app.fetch
+  fetch: app.fetch,
 };
