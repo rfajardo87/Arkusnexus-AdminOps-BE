@@ -2,11 +2,13 @@ import { Hono } from "hono";
 import {
   AccessKey,
   Cliente,
+  Libre,
   Responsable,
   Usuario,
   UsuarioRol,
 } from "../models";
 import source from "../sqlz/source";
+import { quickException } from "../shared/exception";
 
 const usuario = new Hono();
 
@@ -15,7 +17,7 @@ usuario.get("/", async (c) => {
     const usuarios = await Usuario.findAll();
     return c.json(usuarios, 200);
   } catch (error) {
-    return (c.error = error);
+    return quickException(c, error);
   }
 });
 
@@ -24,7 +26,7 @@ usuario.get("/responsable", async (c) => {
     const responsables = await Responsable.findAll();
     return c.json(responsables);
   } catch (error) {
-    return (c.error = error);
+    return quickException(c, error);
   }
 });
 
@@ -33,7 +35,16 @@ usuario.get("/cliente", async (c) => {
     const clientes = await Cliente.findAll();
     return c.json(clientes);
   } catch (error) {
-    return (c.error = error);
+    return quickException(c, error);
+  }
+});
+
+usuario.get("/libre", async (c) => {
+  try {
+    const libres = await Libre.findAll();
+    return c.json(libres);
+  } catch (error) {
+    return quickException(c, error);
   }
 });
 
@@ -42,7 +53,7 @@ usuario.get("/:id", async (c) => {
     const { id } = c.req.param();
     return c.json(await Usuario.findByPk(id));
   } catch (error) {
-    return (c.error = error);
+    return quickException(c, error);
   }
 });
 
@@ -65,9 +76,7 @@ usuario.post("/", async (c) => {
     return c.json(nuevo);
   } catch (error) {
     await trans.rollback();
-    c.error = error;
-    c.status(500);
-    return c.text(error);
+    return quickException(c, error);
   }
 });
 
@@ -92,7 +101,7 @@ usuario.delete("/:id", async (c) => {
       })
     );
   } catch (error) {
-    return c.json({ mensaje: error }, 500);
+    return quickException(c, error);
   }
 });
 
@@ -109,7 +118,7 @@ usuario.patch("/:id", async (c) => {
 
     return c.json(await Usuario.findOne({ where: { id } }));
   } catch (error) {
-    return (c.error = error);
+    return quickException(c, error);
   }
 });
 

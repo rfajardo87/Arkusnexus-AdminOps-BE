@@ -1,4 +1,5 @@
 import Usuario from "./usuario";
+import Libre from "./libre";
 import Responsable from "./responsable";
 import Cliente from "./cliente";
 import AccessKey from "./access_key";
@@ -34,4 +35,5 @@ export {
   Usuario,
   Responsable,
   Cliente,
+  Libre
 };

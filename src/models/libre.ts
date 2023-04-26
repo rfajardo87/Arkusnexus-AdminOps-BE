@@ -1,13 +1,13 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from "../sqlz/source";
 
-class Responsable extends Model {
+class Libre extends Model {
   declare nombre: string;
   declare correo: string;
   declare activo: boolean;
 }
 
-Responsable.init(
+Libre.init(
   {
     nombre: DataTypes.STRING,
     correo: DataTypes.STRING,
@@ -17,10 +17,10 @@ Responsable.init(
     },
   },
   {
-    modelName: "Responsable",
-    tableName: "Responsable",
+    modelName: "Libres",
+    tableName: "Libres",
     sequelize,
   }
 );
 
-export default Responsable;
+export default Libre;
