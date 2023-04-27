@@ -1,13 +1,17 @@
 import { Hono } from "hono";
-import { jwt } from "hono/jwt";
 import { logger } from "hono/logger";
 import { cors } from "hono/cors";
 import { serveStatic } from "hono/serve-static.bun";
 
-/**Controllers */
-import v1 from "./controller/v1";
+import Auth from "./controller/auth";
 
-/**documentation */
+/**
+ * Middleware
+ */
+import authJwt from "./middleware/jwt";
+/**
+ * documentation
+ */
 import swaggerUi from "./docs/docs";
 
 const port = parseInt(`${process.env.PORT}`) || 3000;
@@ -26,14 +30,8 @@ app.use(
   })
 );
 
-app.use(
-  "/api/*",
-  jwt({
-    secret: process.env.SECRET_TOKEN,
-  })
-);
-
-app.route("/v1", v1);
+app.route("/auth", Auth);
+app.route("/", authJwt);
 
 console.log(`Running at http://localhost:${port}`);
 
