@@ -57,6 +57,21 @@ usuario.get("/:id", async (c) => {
   }
 });
 
+usuario.get("/:id/roles", async (c) => {
+  try {
+    const { id } = c.req.param();
+    const roles = await UsuarioRol.findAll({
+      where: {
+        usuario_id: id,
+      },
+    });
+
+    return c.json(roles);
+  } catch (error) {
+    return quickException(c, error);
+  }
+});
+
 usuario.post("/", async (c) => {
   const trans = await source.transaction();
   try {

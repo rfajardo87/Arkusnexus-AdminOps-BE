@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { Jwt, create } from "njwt";
-import { AccessKey, Usuario } from "../models";
+import { AccessKey, Usuario, UsuarioRol } from "../models";
 import { quickException } from "../shared/exception";
 
 const auth = new Hono();
@@ -13,30 +13,31 @@ auth.post("/", async (c) => {
       where: {
         correo: data["correo"],
       },
+      include: AccessKey,
     });
 
-    const validation = await AccessKey.findOne({
-      where: {
-        usuario_id: user_session["id"],
-      },
-    });
+    const isAuth = await user_session["AccessKey"]["authenticate"](
+      data["password"]
+    );
 
-    const isValid = await validation["authenticate"](data["password"]);
-
-    if (!isValid) {
+    if (!isAuth) {
       throw new Error("signin failed");
     }
 
     const token: Jwt = create(
-      { correo: user_session["correo"], key: validation["password"] },
+      {
+        correo: user_session["correo"],
+        key: user_session["AccessKey"]["password"],
+      },
       process.env.SECRET_TOKEN
     );
 
     token.setExpiration("1h");
 
     return c.json({
-      isAuth: isValid,
+      isAuth,
       token: token.compact(),
+      info: JSON.stringify({ id: user_session["id"] }),
     });
   } catch (error) {
     return quickException(c, error);
