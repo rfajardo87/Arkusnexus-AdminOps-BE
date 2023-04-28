@@ -43,6 +43,21 @@ equipo.get("/:cuenta_id", async (c) => {
   }
 });
 
+equipo.get("/usuario/:usuario_id", async (c) => {
+  try {
+    const { usuario_id } = c.req.param();
+    const equipos = await Equipo.findAll({
+      where: {
+        usuario_id,
+      },
+      include: Cuenta,
+    });
+    return c.json(equipos);
+  } catch (error) {
+    return quickException(c, error);
+  }
+});
+
 equipo.patch("/:cuenta_id/:usuario_id", async (c) => {
   try {
     const { cuenta_id, usuario_id } = c.req.param();

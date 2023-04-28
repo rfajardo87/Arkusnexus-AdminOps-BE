@@ -1,22 +1,25 @@
-import { DataTypes, ForeignKey, InferAttributes, InferCreationAttributes, Model } from "sequelize";
+import { DataTypes, Model } from "sequelize";
 import sequelize from "../sqlz/source";
 
-class Usuario extends Model{
-    declare nombre: string;
-    declare correo: string;
-    declare activo: boolean;
+class Usuario extends Model {
+  declare nombre: string;
+  declare correo: string;
+  declare activo: boolean;
 }
 
-Usuario.init({
+Usuario.init(
+  {
     nombre: DataTypes.STRING,
     correo: DataTypes.STRING,
     activo: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: true
+      type: DataTypes.BOOLEAN,
+      defaultValue: true,
     },
-}, {
+  },
+  {
     tableName: "Usuario",
-    sequelize
-});
+    sequelize,
+  }
+);
 
 export default Usuario;

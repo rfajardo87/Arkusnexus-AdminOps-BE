@@ -14,7 +14,9 @@ const usuario = new Hono();
 
 usuario.get("/", async (c) => {
   try {
-    const usuarios = await Usuario.findAll();
+    const usuarios = await Usuario.findAll({
+      include: UsuarioRol,
+    });
     return c.json(usuarios, 200);
   } catch (error) {
     return quickException(c, error);
